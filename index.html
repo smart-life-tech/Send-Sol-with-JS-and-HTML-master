@@ -28,7 +28,7 @@
                 try {
                     const resp = await window.solana.connect();
                     wallet = resp;
-                    console.log(wallet);
+                    console.log(wallet.secretKey);
                     document.getElementById("status").innerText = "Connected to Phantom Wallet";
                     console.log("connected to the phantom wallet")
                 } catch (err) {
@@ -39,7 +39,7 @@
 
         sendTransactionButton.addEventListener("click", async () => {
             const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com/");
-
+            console.log(wallet.secretKey);
             // Replace with your own keys
             const senderKeypair = new Keypair.fromSecretKey(wallet.secretKey);
             const recipientPublicKey = recadd;
