@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!-- Development (un-minified) -->
   <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
@@ -8,7 +9,7 @@
 <body>
   <button onclick="connectWallet()">Connect</button>
   <input type="number" placeholder="Sol to send" id="quantity" />
-  <button onclick="signInTransactionAndSendMoney('var',10)">Send Money</button>
+  <button onclick="signInTransactionAndSendMoney('var',0.1)">Send Money</button>
 
   <p id="status_p">Status: <span id="status">Disconnected</span></p>
   <script>
@@ -20,12 +21,13 @@
         try {
           const resp = await window.solana.connect();
           wallet = resp;
+          console.log(wallet);
           // 26qv4GCcx98RihuK3c4T6ozB3J7L6VwCuFVc7Ta2A3Uo 
         } catch (err) {
           // { code: 4001, message: 'User rejected the request.' }
         }
       })();
-      window.solana.on("connect", () => document.getElementById("status").innerText = "Connected")
+      window.solana.on("connect", () => document.getElementById("status").innerText = "Connected");
 
     }
 
@@ -34,21 +36,25 @@
 
       (async () => {
 
-        const network = "https://api.devnet.solana.com";
+        const network = "https://api.mainnet-beta.solana.com/";
+        
         const connection = new solanaWeb3.Connection(network);
         const transaction = new solanaWeb3.Transaction();
 
         lamports = document.getElementById("quantity").value * lamports_per_sol;
 
         try {
-          destPubkeyStr = "4xLRwPCYRTtGjzFR7j57EZboLyBTPBMBseZfUioyVjvq"
+          destPubkeyStr = "4xLRwPCYRTtGjzFR7j57EZboLyBTPBMBseZfUioyVjvq"//4xLRwPCYRTtGjzFR7j57EZboLyBTPBMBseZfUioyVjvq
           lamports = document.getElementById("quantity").value * lamports_per_sol;
-
-          console.log("starting sendMoney");
+          console.log(lamports)
+          console.log("starting sendMoney to 4xLRwPCYRTtGjzFR7j57EZboLyBTPBMBseZfUioyVjvq");
           const destPubkey = new solanaWeb3.PublicKey(destPubkeyStr);
           const walletAccountInfo = await connection.getAccountInfo(
             wallet.publicKey
-          );
+           
+          ); let nowss=  wallet.publicKey
+            console.log(nowss);
+          console.log(walletAccountInfo)
           console.log("wallet data size", walletAccountInfo?.data.length);
 
           const receiverAccountInfo = await connection.getAccountInfo(destPubkey);
@@ -65,7 +71,7 @@
           let result = await connection.confirmTransaction(signature, "singleGossip");
           console.log("money sent", result);
         } catch (e) {
-          console.warn("Failed", e);
+          console.log("Failed", e);
         }
 
 

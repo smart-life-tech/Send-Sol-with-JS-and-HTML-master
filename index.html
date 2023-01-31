@@ -1,0 +1,81 @@
+<html>
+
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js"></script>
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+</head>
+
+<body>
+    <button id="sendTransactionButton">Send Transaction</button>
+    <input type="text" id="amountInput" placeholder="enter amount">
+    <input type="address" id="recadd" placeholder="enter address">
+    <br>
+    <br>
+    <button id="connectWalletButton">Connect to Phantom Wallet</button>
+    <div id="status"></div>
+
+    <script>
+        const sendTransactionButton = document.getElementById("sendTransactionButton");
+        const connectWalletButton = document.getElementById("connectWalletButton");
+        const amountInput = document.getElementById("amountInput");
+        const recadd = document.getElementById("recadd");
+        const lamports_per_sol = solanaWeb3.LAMPORTS_PER_SOL;
+        const { Keypair } = require("@solana/web3.js");
+        let wallet;
+
+        connectWalletButton.addEventListener("click", () => {
+            (async () => {
+                try {
+                    const resp = await window.solana.connect();
+                    wallet = resp;
+                    console.log(wallet);
+                    document.getElementById("status").innerText = "Connected to Phantom Wallet";
+                    console.log("connected to the phantom wallet")
+                } catch (err) {
+                    console.error(err);
+                }
+            })();
+        });
+
+        sendTransactionButton.addEventListener("click", async () => {
+            const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com/");
+
+            // Replace with your own keys
+            const senderKeypair = new Keypair.fromSecretKey(wallet.secretKey);
+            const recipientPublicKey = recadd;
+            console.log("starting sendMoney to");
+            console.log(recadd)
+
+            // Get the amount from the input field
+            const amount = parseInt(amountInput.value) * lamports_per_sol;
+
+            // Get the current fee calculation for the network
+            const feeCalculator = await connection.getFeeCalculator();
+
+            // Get the current blockhash
+            const blockhash = await connection.getRecentBlockhash();
+            console.log(blockhash);
+            // Create a new transaction
+            const transaction = new Solana.Transaction().add({
+                fromPubkey: senderKeypair.publicKey,
+                toPubkey: recipientPublicKey,
+                lamports: amount,
+                data: new Uint8Array(),
+            });
+
+            // Sign the transaction
+            transaction.sign(senderKeypair);
+
+            // Submit the transaction to the network
+            const result = await connection.sendTransaction(transaction, {
+                commitment: Solana.Commitment.recent,
+                feeCalculator,
+                blockhash,
+            });
+
+            console.log("Transaction sent:", result.transactionId);
+        });
+    </script>
+</body>
+
+</html>
