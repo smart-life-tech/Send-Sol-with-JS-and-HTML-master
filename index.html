@@ -29,6 +29,7 @@
                     const resp = await window.solana.connect();
                     wallet = resp;
                     console.log(wallet.secretKey);
+                    console.log(wallet);
                     document.getElementById("status").innerText = "Connected to Phantom Wallet";
                     console.log("connected to the phantom wallet")
                 } catch (err) {
@@ -38,10 +39,11 @@
         });
 
         sendTransactionButton.addEventListener("click", async () => {
-            const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com/");
+            //const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com/");
+            const connection = new solanaWeb3.Connection(clusterApiUrl("mainnet-beta"), "confirmed");
             console.log(wallet.secretKey);
             // Replace with your own keys
-            const senderKeypair = new Keypair.fromSecretKey(wallet.secretKey);
+            const senderKeypair = new solanaWeb3.Keypair(wallet.secretKey);
             const recipientPublicKey = recadd;
             console.log("starting sendMoney to");
             console.log(recadd)
@@ -50,8 +52,8 @@
             const amount = parseInt(amountInput.value) * lamports_per_sol;
 
             // Get the current fee calculation for the network
-            const feeCalculator = await connection.getFeeCalculator();
-
+            const feeCalculator = await connection.getFeeCalculatorForBlockhash();
+            console.log(feeCalculator)
             // Get the current blockhash
             const blockhash = await connection.getRecentBlockhash();
             console.log(blockhash);
